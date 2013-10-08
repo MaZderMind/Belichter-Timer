@@ -2,11 +2,15 @@ void display_init(void)
 {
 	// enable timer0 for display update cycle
 
-	// we want at lease 100Hz update rate on the display
+	// we want at least 100Hz update rate on the display
 	//  to redraw all segments at a rate of 100 Hz we need a 100 Hz * 7 segments * 4 digits = 2.8 kHz timer clock
 	// with the chip running at 4 MHz this is 1/1428 of the clock, so we want a clock divider as close to 1428 as possible
 	// so we set a prescaling divider of 256 and count from 0 to 5. when we reach 5 we'll trigger the interrupt routine
 	// that should give us an interrupt frequency of 3.1 kHz overall redraw cycle of 111.6 Hz
+
+	// store system state and disable interrupts
+	uint8_t sreg_tmp = SREG;
+	cli();
 
 	// prescaler to 256
 	SETBIT(TCCR0B, CS02);
@@ -22,10 +26,10 @@ void display_init(void)
 
 
 	// configure anodes (aka digits)
-	SETBIT(DDRD_A1, P_A1);
-	SETBIT(DDRD_A2, P_A2);
-	SETBIT(DDRD_A3, P_A3);
-	SETBIT(DDRD_A4, P_A4);
+	SETBIT(DDR_A1, P_A1);
+	SETBIT(DDR_A2, P_A2);
+	SETBIT(DDR_A3, P_A3);
+	SETBIT(DDR_A4, P_A4);
 
 	// disable all anodes (aka digits)
 	CLEARBIT(PORT_A1, P_A1);
@@ -34,13 +38,13 @@ void display_init(void)
 	CLEARBIT(PORT_A4, P_A4);
 
 	// configure cathodes (aka segments)
-	SETBIT(DDRD_CA, P_CA);
-	SETBIT(DDRD_CB, P_CB);
-	SETBIT(DDRD_CC, P_CC);
-	SETBIT(DDRD_CD, P_CD);
-	SETBIT(DDRD_CE, P_CE);
-	SETBIT(DDRD_CF, P_CF);
-	SETBIT(DDRD_CG, P_CG);
+	SETBIT(DDR_CA, P_CA);
+	SETBIT(DDR_CB, P_CB);
+	SETBIT(DDR_CC, P_CC);
+	SETBIT(DDR_CD, P_CD);
+	SETBIT(DDR_CE, P_CE);
+	SETBIT(DDR_CF, P_CF);
+	SETBIT(DDR_CG, P_CG);
 
 	// disable all cathodes (aka segments)
 	SETBIT(PORT_CA, P_CA);
@@ -51,9 +55,8 @@ void display_init(void)
 	SETBIT(PORT_CF, P_CF);
 	SETBIT(PORT_CG, P_CG);
 
-	// enable interrupts
-	sei();
-
+	// restore system state
+	SREG = sreg_tmp;
 }
 
 uint8_t cgen[] = {
@@ -98,6 +101,69 @@ void display_set_number(uint16_t number)
 		}
 		else digits[i] = 0;
 	}
+
+	// restore system state
+	SREG = sreg_tmp;
+}
+
+// the maximum time displayable is 99 Minutes and 59 Seconds, which equals 5999 Seconds
+#define TWO_DIGIT_MINUTES 1
+
+void display_set_time(uint16_t number)
+{
+	// guard
+	if(number > 5999)
+		return;
+
+	// store system state and disable interrupts
+	uint8_t sreg_tmp = SREG;
+	cli();
+
+	// update display-number in-memory (volatile)
+	if(number > 0)
+	{
+		digits[0] = number % 10;
+		number /= 10;
+	}
+	else digits[0] = 0;
+
+
+	if(number > 0)
+	{
+		digits[1] = number % 6;
+		number /= 6;
+	}
+	else digits[1] = 0;
+
+
+#if TWO_DIGIT_MINUTES
+
+	if(number > 0)
+	{
+		digits[2] = number % 10;
+		number /= 10;
+	}
+	else digits[2] = 0;
+
+	if(number > 0)
+	{
+		digits[3] = number % 10;
+		number /= 10;
+	}
+	else digits[3] = 10;
+
+#else
+
+	digits[2] = 10;
+
+	if(number > 0)
+	{
+		digits[3] = number % 10;
+		number /= 10;
+	}
+	else digits[3] = 0;
+
+#endif
 
 	// restore system state
 	SREG = sreg_tmp;
