@@ -29,10 +29,10 @@ ISR(PCINT_vect)
 {
 	if(BITCLEAR(PIN_RESET, P_RESET))
 	{
-		set_remaining_time(60);	
+		timer_start();	
 	}
 	else if(BITCLEAR(PIN_START, P_START))
 	{
-		set_remaining_time(180);	
+		timer_set_remaining(180);
 	}
 }

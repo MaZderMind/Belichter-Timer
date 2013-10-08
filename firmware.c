@@ -6,9 +6,9 @@
 #include <pinout.h>
 
 #include <display.c>
+#include <mosfet.c>
 #include <timer.c>
 #include <buttons.c>
-#include <mosfet.c>
 
 int __attribute__((OS_main))
 main(void)
@@ -17,7 +17,7 @@ main(void)
 	buttons_init();
 	mosfet_init();
 	
-	set_remaining_time(60);
+	timer_set_remaining(60);
 	timer_init();
 
 	// enable interrupts
