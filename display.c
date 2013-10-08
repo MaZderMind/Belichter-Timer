@@ -148,6 +148,11 @@ void display_set_empty(void)
 	SREG = sreg_tmp;
 }
 
+// just for the records:
+//   i tried to implement this with lookup tables but it is actually more code,
+//   because the lookuptable goes into the ram and ram lookups need extra ops
+//     this implementation works with just a bunch (actually a whole bunch) of
+//   registets and a set of cpi, brne, sbi and rjmp instructions
 ISR(TIMER0_COMPA_vect)
 {
 	static uint8_t segment_cnt = 0;
