@@ -8,12 +8,14 @@
 #include <display.c>
 #include <timer.c>
 #include <buttons.c>
+#include <mosfet.c>
 
 int __attribute__((OS_main))
 main(void)
 {
 	display_init();
 	buttons_init();
+	mosfet_init();
 	
 	set_remaining_time(60);
 	timer_init();
@@ -21,13 +23,6 @@ main(void)
 	// enable interrupts
 	sei();
 
-	SETBIT(DDRA, PA1);
-
-	while(1)
-	{
-		TOGGLEBIT(PORTA, PA1);
-		_delay_ms(1000);
-	}
-
+	while(1);
 	return 0;
 }

@@ -57,3 +57,8 @@
 #define PIN_START PINB
 #define P_START PB5
 #define PCINT_START PCINT5
+
+
+#define DDR_MOSFET DDRA
+#define PORT_MOSFET PORTA
+#define P_MOSFET PA1

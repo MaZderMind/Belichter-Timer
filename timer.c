@@ -42,10 +42,24 @@ void set_remaining_time(uint16_t time)
 	uint8_t sreg_tmp = SREG;
 	cli();
 
-
 	remaining_time = time;
-	display_set_time(time);
 
+	if(time == 0)
+	{
+		// set display to "done"
+		display_set_done();
+	}
+	else
+	{
+		// update displayed value
+		display_set_time(time);
+
+		// enable mosfet
+		mosfet_enable();
+	}
+
+
+	// reset timer-value to 0
 	TCNT1 = 0;
 
 	// restore system state
@@ -56,10 +70,12 @@ ISR(TIMER1_COMPA_vect)
 {
 	if(remaining_time == 0)
 	{
+		// disable mosfet
+		mosfet_disable();
+
 		display_set_done();
 		return;
 	}
 
-	remaining_time--;
-	display_set_time(remaining_time);
+	display_set_time(--remaining_time);
 }
