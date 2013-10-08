@@ -1,5 +1,3 @@
-#define COMPARE_VALUE 3906
-
 void timer_init(void)
 {
 	// enable timer1 for clock cycle
@@ -21,7 +19,7 @@ void timer_init(void)
 	SETBIT(TCCR1B, WGM12);
 
 	// set output-compare-value to 6 (5 counts) on (timer 0, compare A)
-	OCR1A = COMPARE_VALUE;
+	OCR1A = 3906;
 
 	// enable output-compare interrupt (timer 0, compare A)
 	SETBIT(TIMSK, OCIE1A);
@@ -48,7 +46,7 @@ void set_remaining_time(uint16_t time)
 	remaining_time = time;
 	display_set_time(time);
 
-	OCR1A = COMPARE_VALUE;
+	TCNT1 = 0;
 
 	// restore system state
 	SREG = sreg_tmp;	
