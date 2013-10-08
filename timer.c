@@ -68,7 +68,7 @@ void set_remaining_time(uint16_t time)
 
 ISR(TIMER1_COMPA_vect)
 {
-	if(remaining_time == 0)
+	if(remaining_time == 1)
 	{
 		// disable mosfet
 		mosfet_disable();
