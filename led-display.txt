@@ -1,0 +1,27 @@
+The LED Module was refurbished from an old SAT Receiver. It is a small breakout board consisting of
+four LA4022-11 (http://pdf.datasheetarchive.com/datasheetsmain/Datasheets-27/DSA-530151.pdf) wired
+in parallel (all equal anodes and cathodes are wired together).
+
+The Anodes and Cathodes are bond out to two binheaders of 7 and 4 pins. Those pins are connected as
+described in the following diagram. The actual footprint and an adequate schema symbol can be found
+in the led-display.lbr library alongisde this project.
+
+
+
+LED Module Pinout
+
+  0  1  2  3  4  5  6                    A  B  C  D
+
+0 = Cathode B
+1 = Cathode F
+2 = Cathode A
+3 = Cathode G
+4 = Anode Digit 1
+5 = Anode Digit 2
+6 = Cathode C
+
+
+A = Anode Digit 3
+B = Anode Digit 4
+C = Cathode D
+D = Cathode E
