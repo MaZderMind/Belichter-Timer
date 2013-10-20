@@ -29,7 +29,7 @@ ISR(PCINT_vect)
 {
 	if(BITCLEAR(PIN_RESET, P_RESET))
 	{
-		timer_start();	
+		timer_start();
 	}
 	else if(BITCLEAR(PIN_START, P_START))
 	{
