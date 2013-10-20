@@ -4,9 +4,8 @@ void timer_init(void)
 
 	// we want at exactly 1Hz interrupt cycle
 	// so we set a prescaling divider of 1024 and run the counter with a freqency of 3906.25 Hz
-	// to get down to 1 Hz fro mthere we would need a divider of 65,10416666666... which is obviously not simple to set
-	// so what we'll to is set the counter to 65 and on each 1/10 run we'll set the divider to 66
-	//  actually we'll see if this is necessary for our 4 1/3 minute countdown...
+	// to get down to 1 Hz fro mthere we would need a divider of 3906.25... which is obviously not simple to set
+	// so what we'll to is set the counter to 3906 ignore the small off-error. that's okay for a 3 1/2 minute countdown
 
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;
@@ -18,7 +17,7 @@ void timer_init(void)
 	// auto-clear the counter on output-compare match (timer 0)
 	SETBIT(TCCR1B, WGM12);
 
-	// set output-compare-value to 6 (5 counts) on (timer 0, compare A)
+	// set output-compare-value to 3906
 	OCR1A = 3906;
 
 	// enable output-compare interrupt (timer 0, compare A)
@@ -71,10 +70,10 @@ void timer_set_remaining(uint16_t time)
 	TCNT1 = 0;
 
 	// restore system state
-	SREG = sreg_tmp;	
+	SREG = sreg_tmp;
 }
 
-void timer_start()
+void timer_start(void)
 {
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;
@@ -107,6 +106,7 @@ void timer_start()
 
 ISR(TIMER1_COMPA_vect)
 {
+
 	if(timer_status == TIMER_WAITING_A)
 	{
 		display_set_empty();
