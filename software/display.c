@@ -1,12 +1,12 @@
-void display_init(void)
+	void display_init(void)
 {
 	// enable timer0 for display update cycle
 
 	// we want at least 100Hz update rate on the display
 	//  to redraw all segments at a rate of 100 Hz we need a 100 Hz * 7 segments * 4 digits = 2.8 kHz timer clock
 	// with the chip running at 4 MHz this is 1/1428 of the clock, so we want a clock divider as close to 1428 as possible
-	// so we set a prescaling divider of 256 and count from 0 to 5. when we reach 5 we'll trigger the interrupt routine
-	// that should give us an interrupt frequency of 3.1 kHz overall redraw cycle of 111.6 Hz
+	// so we set a prescaling divider of 256 and count from 0 to 4. when we reach 4 we'll trigger the interrupt routine
+	// that gives us an interrupt frequency of 3.125 kHz per-segment redraw cycle of 111.6 Hz at a duty rate of 3.125%
 
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;
@@ -18,7 +18,7 @@ void display_init(void)
 	// auto-clear the counter on output-compare match (timer 0)
 	SETBIT(TCCR0A, WGM01);
 
-	// set output-compare-value to 6 (5 counts) on (timer 0, compare A)
+	// set output-compare-value to 4 (5 counts) on (timer 0, compare A)
 	OCR0A = 4;
 
 	// enable output-compare interrupt (timer 0, compare A)
