@@ -1,4 +1,4 @@
-void mosfet_init()
+void mosfet_init(void)
 {
 	// configure as output
 	SETBIT(DDR_MOSFET, P_MOSFET);
@@ -7,12 +7,12 @@ void mosfet_init()
 	CLEARBIT(PORT_MOSFET, P_MOSFET);
 }
 
-void mosfet_enable()
+void mosfet_enable(void)
 {
 	SETBIT(PORT_MOSFET, P_MOSFET);
 }
 
-void mosfet_disable()
+void mosfet_disable(void)
 {
 	CLEARBIT(PORT_MOSFET, P_MOSFET);
 }
