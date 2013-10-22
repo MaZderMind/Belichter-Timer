@@ -62,3 +62,7 @@
 #define DDR_MOSFET DDRA
 #define PORT_MOSFET PORTA
 #define P_MOSFET PA1
+
+#define DDR_SND DDRB
+#define PORT_SND PORTB
+#define P_SND PB4
