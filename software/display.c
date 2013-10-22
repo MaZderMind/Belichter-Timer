@@ -221,6 +221,9 @@ void display_set_empty(void)
 //   registets and a set of cpi, brne, sbi and rjmp instructions
 ISR(TIMER0_COMPA_vect)
 {
+	// branch into buttons.c for button debouncing
+	button_debounce_isr();
+
 	static uint8_t segment_cnt = 0;
 	static uint8_t segment = 0; 
 	static uint8_t digit = 0;

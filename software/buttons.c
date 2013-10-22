@@ -25,14 +25,43 @@ void buttons_init(void)
 	SETBIT(GIMSK, PCIE);
 }
 
+#define DEBOUNCE_HI 3
+#define DEBOUNCE_LO 0
+
+uint8_t reset_cnt = 0, start_cnt = 0;
+void button_debounce_isr(void)
+{
+	if(reset_cnt > 0)
+	{
+		if(--reset_cnt == DEBOUNCE_LO)
+			timer_set_remaining(RUNTIME);
+	}
+
+	if(start_cnt > 0)
+	{
+		if(--start_cnt == DEBOUNCE_LO)
+			timer_start();
+	}
+
+}
+
 ISR(PCINT_vect)
 {
 	if(BITCLEAR(PIN_RESET, P_RESET))
 	{
-		timer_start();
+		reset_cnt = DEBOUNCE_HI;
 	}
-	else if(BITCLEAR(PIN_START, P_START))
+	else
 	{
-		timer_set_remaining(180);
+		reset_cnt = DEBOUNCE_LO;
+	}
+
+	if(BITCLEAR(PIN_START, P_START))
+	{
+		start_cnt = DEBOUNCE_HI;
+	}
+	else
+	{
+		start_cnt = DEBOUNCE_LO;
 	}
 }

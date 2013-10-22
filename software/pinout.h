@@ -49,14 +49,14 @@
 #define DDR_RESET DDRB
 #define PORT_RESET PORTB
 #define PIN_RESET PINB
-#define P_RESET PB6
-#define PCINT_RESET PCINT6
+#define P_RESET PB5
+#define PCINT_RESET PCINT5
 
 #define DDR_START DDRB
 #define PORT_START PORTB
 #define PIN_START PINB
-#define P_START PB5
-#define PCINT_START PCINT5
+#define P_START PB6
+#define PCINT_START PCINT6
 
 
 #define DDR_MOSFET DDRA
