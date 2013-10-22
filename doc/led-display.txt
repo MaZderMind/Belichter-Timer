@@ -28,7 +28,7 @@ D = Cathode E
 
 
 
-Anode Naming
+Cathode Naming
 
    --A--
   |     |
@@ -42,3 +42,15 @@ Anode Naming
 
 DP is present but not available as Pin on this package.
 
+
+
+On the softwate-Side the display is driven by a Timer which is configured to oscilate at 3.125kHz. It is shown
+as blue waveform in display.png. The timer drives 4*7 Segements, which gives a display update frequency of
+3125÷7÷4 = 111.6 Hz. So each single Segment blinks at a rate of >100Hz which gives an absolute flicker-free
+display. The yellow waveform in display.png shows Cathode B while displaying "done". In this mode only one Digit
+has an enabled Cathode B, which is why we can senst the Update-Rate of the display nicely. One can see it repeating
+at exactly the calculated 111.6 Hz with a duty-cycle of 1/7/4 = 3.5% (the scope measured 3.125% due to the time
+needed by the chip to to the swiching and the math).
+
+At a duty cycle of only ~3% we need no series resistance to save the led from dying. I did not measure the current
+draw (should do); if someone has a formular at hand, please file an issue.

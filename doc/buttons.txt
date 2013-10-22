@@ -1,0 +1,18 @@
+I have nice tactile 90° noard-mounted switches from omron here (Omron B3F-3100) that actually bounce
+very little. I needed a whole bunch of tried to get the bouncing on the scope; you can see it in
+bounce.png. The yellow waveform is measured right at the switch; the blue comes from the PCINT pin
+change interrupt. In this graphic we can also nicely see the time delay the avr takes to react to pin.
+The scope measured 11.3 µs in this specific case.
+
+We see a bounce after ~40 µs for ~20µs. In the software we have our display timer running at 3.125kHz,
+so its interrupt is firing every 320µs. So a single (complete) tick of our display timer would be enough
+to get rid of any bouncing.
+
+So what we'll do is setup a sub-routine called from our display timer. On Button-Press we'll set a counter
+to 3. On button release we'll set the counter to 0. On each tick of our display timer we'll check if the
+counter is >0. If it is, decremrnt it by 1. If the value after the decrement is == 0, execute the desired
+button-action. This way we supress button-bouncing at both, the falling and the rising edge in a timespan
+of min. 640 µs. This should give us plenty margin with additional bouncing over time.
+
+If still problems with bouncing occur, the number of debounce cycles (DEBOUNCE_HI) can be upped to really
+high values like 250 without loosing the feeling of the device reacting instantaneously.
