@@ -7,6 +7,7 @@
 
 #include "bits.h"
 #include "pinout.h"
+#include "callbacks.h"
 
 #include "display.c"
 #include "mosfet.c"

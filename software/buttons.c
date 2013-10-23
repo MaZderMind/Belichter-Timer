@@ -25,22 +25,31 @@ void buttons_init(void)
 	SETBIT(GIMSK, PCIE);
 }
 
-#define DEBOUNCE_HI 3
-#define DEBOUNCE_LO 0
 
-uint8_t reset_cnt = 0, start_cnt = 0;
+#define DEBOUNCE_HI 3
+#define LONGPRESS_HI 6250 // 2s / 320µs
+
+volatile uint8_t reset_cnt = 0, start_cnt = 0;
+volatile uint16_t reset_longpress_cnt = 0;
+
 void button_debounce_isr(void)
 {
 	if(reset_cnt > 0)
 	{
-		if(--reset_cnt == DEBOUNCE_LO)
-			timer_set_remaining(RUNTIME);
+		if(--reset_cnt == 0)
+			timer_reset_requested();
+	}
+
+	if(reset_longpress_cnt > 0)
+	{
+		if(--reset_longpress_cnt == 0)
+			timer_setmode_requested();
 	}
 
 	if(start_cnt > 0)
 	{
-		if(--start_cnt == DEBOUNCE_LO)
-			timer_start();
+		if(--start_cnt == 0)
+			timer_startstop_requested();
 	}
 
 }
@@ -50,10 +59,12 @@ ISR(PCINT_vect)
 	if(BITCLEAR(PIN_RESET, P_RESET))
 	{
 		reset_cnt = DEBOUNCE_HI;
+		reset_longpress_cnt = LONGPRESS_HI;
 	}
 	else
 	{
-		reset_cnt = DEBOUNCE_LO;
+		reset_cnt = 0;
+		reset_longpress_cnt = 0;
 	}
 
 	if(BITCLEAR(PIN_START, P_START))
@@ -62,6 +73,6 @@ ISR(PCINT_vect)
 	}
 	else
 	{
-		start_cnt = DEBOUNCE_LO;
+		start_cnt = 0;
 	}
 }

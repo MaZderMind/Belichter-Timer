@@ -78,6 +78,8 @@ uint8_t cgen[] = {
 	/* 13 => E */0b1111001,
 	/* 14 => n */0b1010100,
 	/* 15 => d */0b1011110,
+	/* 16 => S */0b1101101,
+	/* 17 => t */0b1111000,
 };
 
 volatile uint8_t digits[4];
@@ -209,6 +211,21 @@ void display_set_empty(void)
 	digits[1] = 10;
 	digits[2] = 10;
 	digits[3] = 10;
+
+	// restore system state
+	SREG = sreg_tmp;
+}
+
+void display_set_set(void)
+{
+	// store system state and disable interrupts
+	uint8_t sreg_tmp = SREG;
+	cli();
+
+	digits[0] = 10;
+	digits[1] = 17;
+	digits[2] = 13;
+	digits[3] = 16;
 
 	// restore system state
 	SREG = sreg_tmp;
