@@ -1,4 +1,4 @@
-I have nice tactile 90° noard-mounted switches from omron here (Omron B3F-3100) that actually bounce
+I have nice tactile 90° board-mounted switches from omron here (Omron B3F-3100) that actually bounce
 very little. I needed a whole bunch of tried to get the bouncing on the scope; you can see it in
 bounce.png. The yellow waveform is measured right at the switch; the blue comes from the PCINT pin
 change interrupt. In this graphic we can also nicely see the time delay the avr takes to react to pin.
