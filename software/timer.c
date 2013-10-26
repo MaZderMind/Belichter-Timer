@@ -1,4 +1,4 @@
-#define CP_VALUE 3906
+#define CP_VALUE 15625
 #define CP_VALUE_FAST CP_VALUE/6
 #define CP_VALUE_SLOW CP_VALUE*2
 
@@ -7,22 +7,21 @@ void timer_init(void)
 	// enable timer1 for clock cycle
 
 	// we want at exactly 1Hz interrupt cycle
-	// so we set a prescaling divider of 1024 and run the counter with a freqency of 3906.25 Hz
-	// to get down to 1 Hz fro mthere we would need a divider of 3906.25... which is obviously not simple to set
-	// so what we'll to is set the counter to 3906 ignore the small off-error. that's okay for a 3 1/2 minute countdown
+	// so we set a prescaling divider of 256 and run the counter with a freqency of 15.625 kHz
+	// to get down to 1 Hz fro mthere we need a divider of 15625 which we set via the Output-Compare Value
 
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;
 	cli();
 
-	// prescaler to 1024
-	SETBITS(TCCR1B, BIT(CS12) | BIT(CS10));
+	// prescaler to 256
+	SETBIT(TCCR1B, CS12);
 
 	// auto-clear the counter on output-compare match (timer 0)
 	SETBIT(TCCR1B, WGM12);
 
-	// set output-compare-value to 3906
-	OCR1A = 3906;
+	// set output-compare-value to 15625
+	OCR1A = CP_VALUE;
 
 	// enable output-compare interrupt (timer 0, compare A)
 	SETBIT(TIMSK, OCIE1A);
