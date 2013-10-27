@@ -87,7 +87,7 @@ AVRDUDE_PROGRAMMER = stk500
 AVRDUDE_PORT = /dev/ttyUSB0
 
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
-#AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
+AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
 
 #AVRDUDE_OPTIONS = -b 57600
 
@@ -136,7 +136,7 @@ ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 #all: build doc
 all: build
 
-build: elf lss hex size
+build: elf lss hex size eep
 
 elf: $(TARGET).elf
 hex: $(TARGET).hex
@@ -147,7 +147,7 @@ sym: $(TARGET).sym
 
 # Program the device.  
 program: build
-	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
+	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM)
 
 program-eep: $(TARGET).eep
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_EEPROM)

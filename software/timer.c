@@ -2,6 +2,13 @@
 #define CP_VALUE_FAST CP_VALUE/6
 #define CP_VALUE_SLOW CP_VALUE*2
 
+#define TIME_MAX 5999
+
+uint16_t ee_runtime EEMEM = 270;
+uint16_t runtime;
+
+void timer_set_remaining(uint16_t time);
+
 void timer_init(void)
 {
 	// enable timer1 for clock cycle
@@ -13,6 +20,9 @@ void timer_init(void)
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;
 	cli();
+
+	runtime = eeprom_read_word(&ee_runtime);
+	timer_set_remaining(runtime);
 
 	// prescaler to 256
 	SETBIT(TCCR1B, CS12);
@@ -47,7 +57,7 @@ volatile uint8_t timer_status = TIMER_WAITING_A;
 void timer_set_remaining(uint16_t time)
 {
 	// guard
-	if(time > 5999)
+	if(time > TIME_MAX)
 		return;
 
 	// store system state and disable interrupts
@@ -142,7 +152,7 @@ void timer_leave_setmode(void)
 	uint8_t sreg_tmp = SREG;
 	cli();
 
-	mosfet_disable();
+	eeprom_write_word(&ee_runtime, runtime);
 
 	timer_status = TIMER_LEAVE_SETMODE;
 	display_set_done();
@@ -155,12 +165,21 @@ void timer_leave_setmode(void)
 	SREG = sreg_tmp;
 }
 
+uint16_t timer_modify(int8_t delta)
+{
+	if(delta > 0 && runtime == TIME_MAX) return runtime;
+	if(delta < 0 && runtime == 0) return runtime;
+
+	return (runtime += delta);
+}
 
 void timer_reset_requested(void)
 {
 	// set runtime if system is in waiting state
 	if(timer_status == TIMER_WAITING_A || timer_status == TIMER_WAITING_B || timer_status == TIMER_FINISHED)
-		timer_set_remaining(RUNTIME);
+		timer_set_remaining(runtime);
+	else if(timer_status == TIMER_SETMODE_A || timer_status == TIMER_SETMODE_B)
+		display_set_time(timer_modify(-1));
 }
 
 void timer_startstop_requested(void)
@@ -170,6 +189,8 @@ void timer_startstop_requested(void)
 		timer_stop();
 	else if(timer_status == TIMER_WAITING_A || timer_status == TIMER_WAITING_B)
 		timer_start();
+	else if(timer_status == TIMER_SETMODE_A || timer_status == TIMER_SETMODE_B)
+		display_set_time(timer_modify(+1));
 }
 
 void timer_setmode_requested(void)
@@ -197,13 +218,13 @@ ISR(TIMER1_COMPA_vect)
 	{
 		OCR1A = CP_VALUE_FAST;
 		timer_status = TIMER_SETMODE_A;
-		display_set_time(RUNTIME);
+		display_set_time(runtime);
 	}
 	else if(timer_status == TIMER_LEAVE_SETMODE)
 	{
 		OCR1A = CP_VALUE;
 		timer_status = TIMER_WAITING_A;
-		display_set_time(RUNTIME);
+		timer_set_remaining(runtime);
 	}
 	else if(timer_status == TIMER_SETMODE_A)
 	{
@@ -212,7 +233,7 @@ ISR(TIMER1_COMPA_vect)
 	}
 	else if(timer_status == TIMER_SETMODE_B)
 	{
-		display_set_time(RUNTIME);
+		display_set_time(runtime);
 		timer_status = TIMER_SETMODE_A;
 	}
 	else if(remaining_time == 1)

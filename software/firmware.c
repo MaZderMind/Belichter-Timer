@@ -1,9 +1,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <avr/eeprom.h>
 #include <stdint.h>
-
-#define RUNTIME 270
 
 #include "bits.h"
 #include "pinout.h"
@@ -22,7 +21,6 @@ main(void)
 	buttons_init();
 	mosfet_init();
 
-	timer_set_remaining(RUNTIME);
 	timer_init();
 
 	// enable interrupts
