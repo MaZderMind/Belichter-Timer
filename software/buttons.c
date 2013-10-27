@@ -26,7 +26,7 @@ void buttons_init(void)
 }
 
 
-#define DEBOUNCE_HI 50
+#define DEBOUNCE_HI 200
 #define LONGPRESS_HI 6250 // 2s / 320µs
 
 volatile uint8_t reset_cnt = 0, start_cnt = 0;
