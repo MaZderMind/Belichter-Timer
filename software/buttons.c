@@ -26,30 +26,32 @@ void buttons_init(void)
 }
 
 
-#define DEBOUNCE_HI 3
+#define DEBOUNCE_HI 10
 #define LONGPRESS_HI 6250 // 2s / 320µs
 
 volatile uint8_t reset_cnt = 0, start_cnt = 0;
-volatile uint16_t reset_longpress_cnt = 0;
+volatile uint16_t both_longpress_cnt = 0;
 
 void button_debounce_isr(void)
 {
 	if(reset_cnt > 0)
 	{
-		if(--reset_cnt == 0)
+		// timer for reset is over and the start button is not pressed in parallel (not both pressed)
+		if(--reset_cnt == 0 && BITSET(PIN_START, P_START))
 			timer_reset_requested();
-	}
-
-	if(reset_longpress_cnt > 0)
-	{
-		if(--reset_longpress_cnt == 0)
-			timer_setmode_requested();
 	}
 
 	if(start_cnt > 0)
 	{
-		if(--start_cnt == 0)
+		// timer for reset is over and the start button is not pressed in parallel (not both pressed)
+		if(--start_cnt == 0 && BITSET(PIN_RESET, P_RESET))
 			timer_startstop_requested();
+	}
+
+	if(both_longpress_cnt > 0)
+	{
+		if(--both_longpress_cnt == 0)
+			timer_setmode_requested();
 	}
 
 }
@@ -59,12 +61,10 @@ ISR(PCINT_vect)
 	if(BITCLEAR(PIN_RESET, P_RESET))
 	{
 		reset_cnt = DEBOUNCE_HI;
-		reset_longpress_cnt = LONGPRESS_HI;
 	}
 	else
 	{
 		reset_cnt = 0;
-		reset_longpress_cnt = 0;
 	}
 
 	if(BITCLEAR(PIN_START, P_START))
@@ -75,4 +75,14 @@ ISR(PCINT_vect)
 	{
 		start_cnt = 0;
 	}
+
+	if(BITCLEAR(PIN_RESET, P_RESET) && BITCLEAR(PIN_START, P_START))
+	{
+		both_longpress_cnt = LONGPRESS_HI;
+	}
+	else
+	{
+		both_longpress_cnt = 0;
+	}
+
 }
