@@ -88,6 +88,7 @@ AVRDUDE_PORT = /dev/ttyUSB0
 
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
+AVRDUDE_WRITE_FUSE = -U lfuse:w:0xc0:m -U hfuse:w:0xd9:m -U efuse:w:0xff:m
 
 #AVRDUDE_OPTIONS = -b 57600
 
@@ -151,6 +152,9 @@ program: build
 
 program-eep: $(TARGET).eep
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_EEPROM)
+
+program-fuse:
+	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FUSE)
 
 
 # Print the devices space usage
