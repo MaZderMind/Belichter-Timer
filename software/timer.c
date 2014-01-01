@@ -9,7 +9,7 @@ uint16_t runtime;
 
 void timer_set_remaining(uint16_t time);
 
-void timer_init(void)
+inline void timer_init(void)
 {
 	// enable timer1 for clock cycle
 
@@ -128,7 +128,7 @@ void timer_stop(void)
 	SREG = sreg_tmp;
 }
 
-void timer_enter_setmode(void)
+inline void timer_enter_setmode(void)
 {
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;
@@ -147,7 +147,7 @@ void timer_enter_setmode(void)
 	SREG = sreg_tmp;
 }
 
-void timer_leave_setmode(void)
+inline void timer_leave_setmode(void)
 {
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;
@@ -166,7 +166,7 @@ void timer_leave_setmode(void)
 	SREG = sreg_tmp;
 }
 
-uint16_t timer_modify(int8_t delta)
+inline uint16_t timer_modify(int8_t delta)
 {
 	if(delta > 0 && runtime == TIME_MAX) return runtime;
 	if(delta < 0 && runtime == 0) return runtime;
@@ -196,7 +196,7 @@ void timer_startstop_requested(void)
 		display_set_open();
 }
 
-void timer_setmode_requested(void)
+inline void timer_setmode_requested(void)
 {
 	if(timer_status == TIMER_SETMODE_A || timer_status == TIMER_SETMODE_B || timer_status == TIMER_ENTER_SETMODE)
 		timer_leave_setmode();
@@ -204,7 +204,7 @@ void timer_setmode_requested(void)
 		timer_enter_setmode();
 }
 
-void timer_case_set_opened(void)
+inline void timer_case_set_opened(void)
 {
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;
@@ -218,7 +218,7 @@ void timer_case_set_opened(void)
 	SREG = sreg_tmp;
 }
 
-void timer_case_set_closed(void)
+inline void timer_case_set_closed(void)
 {
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;

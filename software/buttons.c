@@ -1,4 +1,4 @@
-void buttons_init(void)
+inline void buttons_init(void)
 {
 	// configure reset pin to an input
 	CLEARBIT(DDR_RESET, P_RESET);

@@ -1,4 +1,4 @@
-	void display_init(void)
+inline void display_init(void)
 {
 	// enable timer0 for display update cycle
 
