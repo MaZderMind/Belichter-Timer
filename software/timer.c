@@ -4,7 +4,7 @@
 
 #define TIME_MAX 5999
 
-uint16_t ee_runtime EEMEM = 10;//270;
+uint16_t ee_runtime EEMEM = 270;
 uint16_t runtime;
 
 volatile uint16_t cnt = 0, cnttop = CP_VALUE;
