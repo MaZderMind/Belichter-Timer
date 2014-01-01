@@ -48,6 +48,7 @@ void timer_init(void)
 #define TIMER_SETMODE_A 5
 #define TIMER_SETMODE_B 6
 #define TIMER_FINISHED 7
+#define TIMER_OPEN 8
 
 // the maximum time displayable is 99 Minutes and 59 Seconds, which equals 5999 Seconds. Therefore we need an 16 bit counter variable
 volatile uint16_t remaining_time = 0;
@@ -191,6 +192,8 @@ void timer_startstop_requested(void)
 		timer_start();
 	else if(timer_status == TIMER_SETMODE_A || timer_status == TIMER_SETMODE_B)
 		display_set_time(timer_modify(+1));
+	else if(timer_status == TIMER_OPEN)
+		display_set_open();
 }
 
 void timer_setmode_requested(void)
@@ -201,6 +204,35 @@ void timer_setmode_requested(void)
 		timer_enter_setmode();
 }
 
+void timer_case_set_opened(void)
+{
+	// store system state and disable interrupts
+	uint8_t sreg_tmp = SREG;
+	cli();
+
+	timer_status = TIMER_OPEN;
+	display_set_open();
+	mosfet_disable();
+
+	// restore system state
+	SREG = sreg_tmp;
+}
+
+void timer_case_set_closed(void)
+{
+	// store system state and disable interrupts
+	uint8_t sreg_tmp = SREG;
+	cli();
+
+	if(timer_status == TIMER_OPEN)
+	{
+		display_set_time(remaining_time);
+		timer_status = TIMER_WAITING_A;
+	}
+
+	// restore system state
+	SREG = sreg_tmp;
+}
 
 ISR(TIMER1_COMPA_vect)
 {
@@ -236,16 +268,19 @@ ISR(TIMER1_COMPA_vect)
 		display_set_time(runtime);
 		timer_status = TIMER_SETMODE_A;
 	}
-	else if(remaining_time == 1)
+	else if(timer_status == TIMER_RUNNING)
 	{
-		timer_status = TIMER_FINISHED;
-		// disable mosfet
-		mosfet_disable();
+		if(remaining_time == 1)
+		{
+			timer_status = TIMER_FINISHED;
+			// disable mosfet
+			mosfet_disable();
 
-		display_set_done();
-	}
-	else
-	{
-		display_set_time(--remaining_time);
+			display_set_done();
+		}
+		else
+		{
+			display_set_time(--remaining_time);
+		}
 	}
 }

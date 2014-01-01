@@ -58,6 +58,12 @@
 #define P_START PB6
 #define PCINT_START PCINT6
 
+#define DDR_CASE DDRB
+#define PORT_CASE PORTB
+#define PIN_CASE PINB
+#define P_CASE PB7
+#define PCINT_CASE PCINT7
+
 
 #define DDR_MOSFET DDRA
 #define PORT_MOSFET PORTA

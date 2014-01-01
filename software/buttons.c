@@ -1,7 +1,7 @@
 void buttons_init(void)
 {
-	// configure reset pin to ie an input
-	SETBIT(DDR_RESET, P_RESET);
+	// configure reset pin to an input
+	CLEARBIT(DDR_RESET, P_RESET);
 
 	// enable pullup for reset btn
 	SETBIT(PORT_RESET, P_RESET);
@@ -10,14 +10,24 @@ void buttons_init(void)
 	SETBIT(PCMSK, PCINT_RESET);
 
 
-	// configure start pin to ie an input
-	SETBIT(DDR_START, P_START);
+	// configure start pin to an input
+	CLEARBIT(DDR_START, P_START);
 
 	// enable pullup for start btn
 	SETBIT(PORT_START, P_START);
 
 	// enable pin change interrupt for start one of the buttons
 	SETBIT(PCMSK, PCINT_START);
+
+
+	// configure start pin to an input
+	CLEARBIT(DDR_CASE, P_CASE);
+
+	// enable pullup for start btn
+	SETBIT(PORT_CASE, P_CASE);
+
+	// enable pin change interrupt for start one of the buttons
+	SETBIT(PCMSK, PCINT_CASE);
 
 
 
@@ -29,7 +39,7 @@ void buttons_init(void)
 #define DEBOUNCE_HI 200
 #define LONGPRESS_HI 6250 // 2s / 320µs
 
-volatile uint8_t reset_cnt = 0, start_cnt = 0;
+volatile uint8_t reset_cnt = 0, start_cnt = 0, open_cnt = 0, was_open = 1;
 volatile uint16_t both_longpress_cnt = 0;
 
 void button_debounce_isr(void)
@@ -52,6 +62,15 @@ void button_debounce_isr(void)
 	{
 		if(--both_longpress_cnt == 0)
 			timer_setmode_requested();
+	}
+
+	if(open_cnt > 0)
+	{
+		if(--open_cnt == 0 && BITCLEAR(PIN_CASE, P_CASE))
+		{
+			was_open = 1;
+			timer_case_set_opened();
+		}
 	}
 
 }
@@ -85,4 +104,13 @@ ISR(PCINT_vect)
 		both_longpress_cnt = 0;
 	}
 
+	if(BITCLEAR(PIN_CASE, P_CASE))
+	{
+		open_cnt = DEBOUNCE_HI;
+	}
+	else if(was_open)
+	{
+		was_open = 0;
+		timer_case_set_closed();
+	}
 }
