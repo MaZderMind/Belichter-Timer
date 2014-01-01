@@ -12,6 +12,7 @@
 #include "mosfet.c"
 #include "timer.c"
 #include "buttons.c"
+#include "beep.c"
 
 
 int __attribute__((OS_main))

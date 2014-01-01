@@ -1,11 +1,13 @@
-#define CP_VALUE 15625
+#define CP_VALUE 15625/5
 #define CP_VALUE_FAST CP_VALUE/6
 #define CP_VALUE_SLOW CP_VALUE*2
 
 #define TIME_MAX 5999
 
-uint16_t ee_runtime EEMEM = 270;
+uint16_t ee_runtime EEMEM = 10;//270;
 uint16_t runtime;
+
+volatile uint16_t cnt = 0, cnttop = CP_VALUE;
 
 void timer_set_remaining(uint16_t time);
 
@@ -30,11 +32,13 @@ inline void timer_init(void)
 	// auto-clear the counter on output-compare match (timer 0)
 	SETBIT(TCCR1B, WGM12);
 
-	// set output-compare-value to 15625
-	OCR1A = CP_VALUE;
+	SETBIT(TIMSK, OCIE1A);
+
+	// set output-compare-value to 1
+	OCR1A = 5;
+	//TCNT1 = 0;
 
 	// enable output-compare interrupt (timer 0, compare A)
-	SETBIT(TIMSK, OCIE1A);
 
 	// restore system state
 	SREG = sreg_tmp;
@@ -87,7 +91,7 @@ void timer_set_remaining(uint16_t time)
 
 
 	// reset timer-value to 0
-	TCNT1 = 0;
+	cnt = 0;
 
 	// restore system state
 	SREG = sreg_tmp;
@@ -105,7 +109,7 @@ void timer_start(void)
 	display_set_time(remaining_time);
 
 	// reset timer-value to 0
-	TCNT1 = 0;
+	cnt = 0;
 
 	// restore system state
 	SREG = sreg_tmp;
@@ -122,7 +126,7 @@ void timer_stop(void)
 	timer_status = TIMER_WAITING_A;
 
 	// reset timer-value to 0
-	TCNT1 = 0;
+	cnt = 0;
 
 	// restore system state
 	SREG = sreg_tmp;
@@ -140,8 +144,8 @@ inline void timer_enter_setmode(void)
 	display_set_set();
 
 	// reset timer-value to 0
-	OCR1A = CP_VALUE_SLOW;
-	TCNT1 = 0;
+	cnttop = CP_VALUE_SLOW;
+	cnt = 0;
 
 	// restore system state
 	SREG = sreg_tmp;
@@ -159,8 +163,8 @@ inline void timer_leave_setmode(void)
 	display_set_done();
 
 	// reset timer-value to 0
-	OCR1A = CP_VALUE_SLOW;
-	TCNT1 = 0;
+	cnttop = CP_VALUE_SLOW;
+	cnt = 0;
 
 	// restore system state
 	SREG = sreg_tmp;
@@ -236,6 +240,10 @@ inline void timer_case_set_closed(void)
 
 ISR(TIMER1_COMPA_vect)
 {
+	beep_cb();
+	if(++cnt < cnttop) return;
+	cnt = 0;
+
 	if(timer_status == TIMER_WAITING_A)
 	{
 		display_set_empty();
@@ -248,13 +256,13 @@ ISR(TIMER1_COMPA_vect)
 	}
 	else if(timer_status == TIMER_ENTER_SETMODE)
 	{
-		OCR1A = CP_VALUE_FAST;
+		cnttop = CP_VALUE_FAST;
 		timer_status = TIMER_SETMODE_A;
 		display_set_time(runtime);
 	}
 	else if(timer_status == TIMER_LEAVE_SETMODE)
 	{
-		OCR1A = CP_VALUE;
+		cnttop = CP_VALUE;
 		timer_status = TIMER_WAITING_A;
 		timer_set_remaining(runtime);
 	}
@@ -275,6 +283,7 @@ ISR(TIMER1_COMPA_vect)
 			timer_status = TIMER_FINISHED;
 			// disable mosfet
 			mosfet_disable();
+			beep_enable();
 
 			display_set_done();
 		}
@@ -282,5 +291,9 @@ ISR(TIMER1_COMPA_vect)
 		{
 			display_set_time(--remaining_time);
 		}
+	}
+	else if(timer_status == TIMER_FINISHED)
+	{
+		beep_disable();
 	}
 }

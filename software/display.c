@@ -86,8 +86,8 @@ volatile uint8_t digits[4];
 void display_set_number(uint16_t number)
 {
 	// guard
-	if(number > 9999)
-		return;
+//	if(number > 9999)
+//		return;
 
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;
@@ -114,8 +114,8 @@ void display_set_number(uint16_t number)
 void display_set_time(uint16_t number)
 {
 	// guard
-	if(number > 5999)
-		return;
+//	if(number > 5999)
+//		return;
 
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;
