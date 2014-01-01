@@ -15,7 +15,7 @@ void timer_init(void)
 
 	// we want at exactly 1Hz interrupt cycle
 	// so we set a prescaling divider of 256 and run the counter with a freqency of 15.625 kHz
-	// to get down to 1 Hz fro mthere we need a divider of 15625 which we set via the Output-Compare Value
+	// to get down to 1 Hz from there we need a divider of 15625 which we set via the Output-Compare Value
 
 	// store system state and disable interrupts
 	uint8_t sreg_tmp = SREG;
