@@ -8,11 +8,11 @@
 #include "pinout.h"
 #include "callbacks.h"
 
+#include "beep.c"
 #include "display.c"
 #include "mosfet.c"
 #include "timer.c"
 #include "buttons.c"
-#include "beep.c"
 
 
 int __attribute__((OS_main))
