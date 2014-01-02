@@ -60,26 +60,28 @@ inline void display_init(void)
 }
 
 uint8_t cgen[] = {
+	/*       GFEDCBA*/
 	/* 0 */0b0111111,
-	/* 1 */0b0000110,
+	/* 1 */0b0110000,
 	/* 2 */0b1011011,
-	/* 3 */0b1001111,
-	/* 4 */0b1100110,
+	/* 3 */0b1111001,
+	/* 4 */0b1110100,
 	/* 5 */0b1101101,
-	/* 6 */0b1111101,
-	/* 7 */0b0000111,
+	/* 6 */0b1101111,
+	/* 7 */0b0111000,
 	/* 8 */0b1111111,
-	/* 9 */0b1101111,
+	/* 9 */0b1111101,
+	/*       GFEDCBA*/
 
 	/* 10 => '' */0b000000,
-	
-	/* 11 => o */0b1011100,
-	/* 12 => P */0b1110011,
-	/* 13 => E */0b1111001,
-	/* 14 => n */0b1010100,
-	/* 15 => d */0b1011110,
-	/* 16 => S */0b1101101,
-	/* 17 => t */0b1111000,
+
+	/*             GFEDCBA*/
+	/* 11 => P */0b1011110,
+	/* 12 => E */0b1001111,
+	/* 13 => N */0b0111110,
+	/* 14 => d */0b1110011,
+	/* 15 => t */0b1000111,
+	/*             GFEDCBA*/
 };
 
 volatile uint8_t digits[4];
@@ -177,10 +179,10 @@ void display_set_open(void)
 	uint8_t sreg_tmp = SREG;
 	cli();
 
-	digits[0] = 14;
-	digits[1] = 13;
-	digits[2] = 12;
-	digits[3] = 11;
+	digits[0] = 13;
+	digits[1] = 12;
+	digits[2] = 11;
+	digits[3] = 0;
 
 	// restore system state
 	SREG = sreg_tmp;
@@ -192,10 +194,10 @@ void display_set_done(void)
 	uint8_t sreg_tmp = SREG;
 	cli();
 
-	digits[0] = 13;
-	digits[1] = 14;
-	digits[2] = 11;
-	digits[3] = 15;
+	digits[0] = 12;
+	digits[1] = 13;
+	digits[2] = 0;
+	digits[3] = 14;
 
 	// restore system state
 	SREG = sreg_tmp;
@@ -223,9 +225,9 @@ void display_set_set(void)
 	cli();
 
 	digits[0] = 10;
-	digits[1] = 17;
-	digits[2] = 13;
-	digits[3] = 16;
+	digits[1] = 15;
+	digits[2] = 12;
+	digits[3] = 5;
 
 	// restore system state
 	SREG = sreg_tmp;
@@ -246,13 +248,13 @@ ISR(TIMER0_COMPA_vect)
 	static uint8_t digit = 0;
 
 	// disable last-active anode (aka digit)
-	if(digit == 0)
+	if(digit == 3)
 		CLEARBIT(PORT_A1, P_A1);
-	else if(digit == 1)
-		CLEARBIT(PORT_A2, P_A2);
 	else if(digit == 2)
+		CLEARBIT(PORT_A2, P_A2);
+	else if(digit == 1)
 		CLEARBIT(PORT_A3, P_A3);
-	else if(digit == 3)
+	else if(digit == 0)
 		CLEARBIT(PORT_A4, P_A4);
 
 	// disable last active cathode (aka segment)
@@ -282,13 +284,13 @@ ISR(TIMER0_COMPA_vect)
 	if(BITSET(digit_to_display, segment))
 	{
 		// enable anode (aka digit)
-		if(digit == 0)
+		if(digit == 3)
 			SETBIT(PORT_A1, P_A1);
-		else if(digit == 1)
-			SETBIT(PORT_A2, P_A2);
 		else if(digit == 2)
+			SETBIT(PORT_A2, P_A2);
+		else if(digit == 1)
 			SETBIT(PORT_A3, P_A3);
-		else if(digit == 3)
+		else if(digit == 0)
 			SETBIT(PORT_A4, P_A4);
 
 		// enable cathode (aka segment)

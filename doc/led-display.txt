@@ -30,15 +30,15 @@ D = Cathode E
 
 Cathode Naming
 
-   --A--
+   --D--
   |     |
-  F     B
+  C     E
   |     |
    --G--
   |     |
-  E     C
+  B     F
   |     |
-   --D--
+   --A--
 
 DP is present but not available as Pin on this package.
 
